@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+  <url>
+    <loc>https://adaderana.lk/news/cmsrrdxm8000a356q3041osft</loc>
+    <news:news>
+      <news:publication>
+        <news:name>Ada Derana English</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-13T16:56:14.495Z</news:publication_date>
+      <news:title>US can keep naval blockade on Iranian ports &quot;indefinitely,&quot; Pentagon chief says</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://adaderana.lk/news/cmsroyvzu0009356qg4rz5jp0</loc>
+    <news:news>
+      <news:publication>
+        <news:name>Ada Derana English</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-13T16:01:50.210Z</news:publication_date>
+      <news:title>No question paper leak; Exams Dept urges students to sit for A/L exam without undue fears</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://adaderana.lk/news/cmsr9elup000d356p5dkhj3xr</loc>
+    <news:news>
+      <news:publication>
+        <news:name>Ada Derana English</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-10T09:00:00.000Z</news:publication_date>
+      <news:title>Older article published before the last scrape</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://adaderana.lk/news/115700</loc>
+    <news:news>
+      <news:publication>
+        <news:name>Ada Derana English</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>2026-08-13T10:00:00.000Z</news:publication_date>
+      <news:title>Legacy numeric-ID article that must be ignored</news:title>
+    </news:news>
+  </url>
+  <url>
+    <loc>https://adaderana.lk/categories/latest</loc>
+  </url>
+</urlset>
