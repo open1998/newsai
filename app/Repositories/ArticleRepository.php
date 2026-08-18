@@ -124,4 +124,24 @@ class ArticleRepository implements ArticleRepositoryInterface
     {
         return Article::find($id);
     }
+
+    /**
+     * Return per-source article statistics for the dashboard, ordered by name.
+     *
+     * @return Collection<int, NewsSource>
+     */
+    public function getSourceStats(): Collection
+    {
+        return NewsSource::query()
+            ->withCount([
+                'articles',
+                'articles as ai_succeeded_count' => fn ($q) => $q->where('ai_status', AiStatus::Succeeded),
+                'articles as ai_pending_count' => fn ($q) => $q->where('ai_status', AiStatus::Pending),
+                'articles as ai_processing_count' => fn ($q) => $q->where('ai_status', AiStatus::Processing),
+                'articles as ai_failed_count' => fn ($q) => $q->where('ai_status', AiStatus::Failed),
+                'articles as ai_skipped_count' => fn ($q) => $q->where('ai_status', AiStatus::Skipped),
+            ])
+            ->orderBy('name')
+            ->get();
+    }
 }

@@ -72,4 +72,14 @@ interface ArticleRepositoryInterface
      * Find a single article by its primary key.
      */
     public function findById(int $id): ?Article;
+
+    /**
+     * Return per-source article statistics for the dashboard, ordered by name.
+     *
+     * Each source carries aggregate attributes: articles_count, ai_succeeded_count,
+     * ai_pending_count, ai_processing_count, ai_failed_count, ai_skipped_count.
+     *
+     * @return Collection<int, NewsSource>
+     */
+    public function getSourceStats(): Collection;
 }
