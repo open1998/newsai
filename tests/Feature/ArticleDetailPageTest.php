@@ -1,12 +1,12 @@
 <?php
 
 use App\Contracts\ArticleRepositoryInterface;
-use App\Enums\AiStatus;
 use App\Enums\Language;
 use App\Models\Article;
 use App\Models\NewsSource;
 use App\Repositories\ArticleRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -23,7 +23,7 @@ test('article detail route is publicly accessible without authentication', funct
 // ── 2. Correct article is displayed ──────────────────────────────────────────
 
 test('article detail page displays the correct article', function () {
-    $source  = NewsSource::factory()->create(['name' => 'Daily Mirror LK']);
+    $source = NewsSource::factory()->create(['name' => 'Daily Mirror LK']);
     $article = Article::factory()->aiProcessed()->create([
         'news_source_id' => $source->id,
         'original_title' => 'Unique Original Headline Here',
@@ -38,7 +38,7 @@ test('article detail page displays the correct article', function () {
 
 test('AI title is shown when article has been AI processed', function () {
     $article = Article::factory()->aiProcessed()->create([
-        'ai_title'       => 'AI Rewritten Title',
+        'ai_title' => 'AI Rewritten Title',
         'original_title' => 'Original Title',
     ]);
 
@@ -51,7 +51,7 @@ test('AI title is shown when article has been AI processed', function () {
 
 test('original title is shown when AI has not processed the article', function () {
     $article = Article::factory()->create([
-        'ai_title'       => null,
+        'ai_title' => null,
         'original_title' => 'Unprocessed Original Title',
     ]);
 
@@ -63,7 +63,7 @@ test('original title is shown when AI has not processed the article', function (
 
 test('AI body is shown when article has been AI processed', function () {
     $article = Article::factory()->aiProcessed()->create([
-        'ai_body'       => 'AI rewritten body paragraph.',
+        'ai_body' => 'AI rewritten body paragraph.',
         'original_body' => 'Original body paragraph.',
     ]);
 
@@ -76,7 +76,7 @@ test('AI body is shown when article has been AI processed', function () {
 
 test('original body is shown when AI has not processed the article', function () {
     $article = Article::factory()->create([
-        'ai_body'       => null,
+        'ai_body' => null,
         'original_body' => 'The original body of the article.',
     ]);
 
@@ -124,7 +124,7 @@ test('language badge is displayed on the article page', function () {
 });
 
 test('source name is displayed on the article page', function () {
-    $source  = NewsSource::factory()->create(['name' => 'Hiru News']);
+    $source = NewsSource::factory()->create(['name' => 'Hiru News']);
     $article = Article::factory()->create(['news_source_id' => $source->id]);
 
     $this->get(route('news.show', $article))
@@ -133,7 +133,7 @@ test('source name is displayed on the article page', function () {
 
 test('published date is displayed when set', function () {
     $article = Article::factory()->create([
-        'published_at' => \Illuminate\Support\Carbon::parse('2026-01-15 10:00:00'),
+        'published_at' => Carbon::parse('2026-01-15 10:00:00'),
     ]);
 
     $this->get(route('news.show', $article))

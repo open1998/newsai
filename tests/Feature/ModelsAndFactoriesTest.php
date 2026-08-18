@@ -5,6 +5,7 @@ use App\Enums\Language;
 use App\Enums\ScrapeStatus;
 use App\Models\Article;
 use App\Models\NewsSource;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -70,7 +71,7 @@ test('NewsSource slug is unique', function () {
     NewsSource::factory()->create(['slug' => 'test-source']);
 
     expect(fn () => NewsSource::factory()->create(['slug' => 'test-source']))
-        ->toThrow(\Illuminate\Database\QueryException::class);
+        ->toThrow(QueryException::class);
 });
 
 // ── Article model ────────────────────────────────────────────────────────────
@@ -132,7 +133,7 @@ test('articles table enforces unique constraint on news_source_id and source_url
     expect(fn () => Article::factory()->create([
         'news_source_id' => $source->id,
         'source_url' => 'https://example.com/article/1',
-    ]))->toThrow(\Illuminate\Database\QueryException::class);
+    ]))->toThrow(QueryException::class);
 });
 
 test('same source_url is allowed for different news sources', function () {

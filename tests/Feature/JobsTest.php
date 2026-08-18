@@ -2,6 +2,7 @@
 
 use App\Contracts\ArticleAiDriverInterface;
 use App\Contracts\ArticleRepositoryInterface;
+use App\Contracts\ScraperInterface;
 use App\Enums\AiStatus;
 use App\Enums\Language;
 use App\Exceptions\AiProcessingException;
@@ -11,7 +12,9 @@ use App\Models\Article;
 use App\Models\NewsSource;
 use App\Services\Scrapers\PlaceholderScraper;
 use App\Services\Scrapers\ScraperFactory;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Factory;
 use Illuminate\Support\Facades\Queue;
 
 uses(RefreshDatabase::class);
@@ -53,7 +56,8 @@ test('ScrapeSourceJob dispatches ProcessArticleWithAiJob for each new article', 
     $source = NewsSource::factory()->english()->create();
 
     // Create a scraper that returns two article URLs
-    $fakeScraper = new class($source, app(\Illuminate\Http\Client\Factory::class)) extends PlaceholderScraper {
+    $fakeScraper = new class($source, app(Factory::class)) extends PlaceholderScraper
+    {
         public function scrapeArchive(): array
         {
             return [
@@ -74,7 +78,8 @@ test('ScrapeSourceJob dispatches ProcessArticleWithAiJob for each new article', 
     };
 
     // Bind the fake scraper via a custom factory
-    $factory = new class(app(\Illuminate\Contracts\Container\Container::class)) extends ScraperFactory {
+    $factory = new class(app(Container::class)) extends ScraperFactory
+    {
         private PlaceholderScraper $customScraper;
 
         public function setCustomScraper(PlaceholderScraper $scraper): void
@@ -82,7 +87,7 @@ test('ScrapeSourceJob dispatches ProcessArticleWithAiJob for each new article', 
             $this->customScraper = $scraper;
         }
 
-        public function make(NewsSource $source): \App\Contracts\ScraperInterface
+        public function make(NewsSource $source): ScraperInterface
         {
             return $this->customScraper;
         }
@@ -110,7 +115,8 @@ test('ScrapeSourceJob does not re-dispatch AI job when content is unchanged and 
         'content_hash' => $contentHash,
     ]);
 
-    $fakeScraper = new class($source, app(\Illuminate\Http\Client\Factory::class)) extends PlaceholderScraper {
+    $fakeScraper = new class($source, app(Factory::class)) extends PlaceholderScraper
+    {
         public function scrapeArchive(): array
         {
             return ['https://example.com/article/1'];
@@ -127,7 +133,8 @@ test('ScrapeSourceJob does not re-dispatch AI job when content is unchanged and 
         }
     };
 
-    $factory = new class(app(\Illuminate\Contracts\Container\Container::class)) extends ScraperFactory {
+    $factory = new class(app(Container::class)) extends ScraperFactory
+    {
         private PlaceholderScraper $customScraper;
 
         public function setCustomScraper(PlaceholderScraper $scraper): void
@@ -135,7 +142,7 @@ test('ScrapeSourceJob does not re-dispatch AI job when content is unchanged and 
             $this->customScraper = $scraper;
         }
 
-        public function make(NewsSource $source): \App\Contracts\ScraperInterface
+        public function make(NewsSource $source): ScraperInterface
         {
             return $this->customScraper;
         }

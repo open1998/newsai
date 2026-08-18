@@ -53,7 +53,7 @@ test('ScraperFactory resolves PlaceholderScraper for a NewsSource', function () 
 });
 
 test('ScraperFactory throws ScrapingException for a class that does not implement ScraperInterface', function () {
-    $source = NewsSource::factory()->create(['scraper_class' => \stdClass::class]);
+    $source = NewsSource::factory()->create(['scraper_class' => stdClass::class]);
     $factory = app(ScraperFactory::class);
 
     expect(fn () => $factory->make($source))
@@ -73,7 +73,8 @@ test('fetchDom returns a DOMDocument on a successful HTTP response', function ()
     ]);
 
     // Expose fetchDom via an anonymous subclass for testing
-    $scraper = new class($source, app(HttpFactory::class)) extends PlaceholderScraper {
+    $scraper = new class($source, app(HttpFactory::class)) extends PlaceholderScraper
+    {
         public function exposedFetchDom(string $url): DOMDocument
         {
             return $this->fetchDom($url);
@@ -95,7 +96,8 @@ test('fetchDom throws ScrapingException on HTTP failure', function () {
         'archive_url' => 'https://example.com/archive',
     ]);
 
-    $scraper = new class($source, app(HttpFactory::class)) extends PlaceholderScraper {
+    $scraper = new class($source, app(HttpFactory::class)) extends PlaceholderScraper
+    {
         public function exposedFetchDom(string $url): DOMDocument
         {
             return $this->fetchDom($url);

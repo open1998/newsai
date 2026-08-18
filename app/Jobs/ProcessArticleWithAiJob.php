@@ -49,6 +49,7 @@ class ProcessArticleWithAiJob implements ShouldQueue
         // Idempotency: skip if already successfully processed
         if ($this->article->ai_status === AiStatus::Succeeded && $this->article->ai_processed_at !== null) {
             $articleRepository->markAiStatus($this->article, AiStatus::Skipped);
+
             return;
         }
 
