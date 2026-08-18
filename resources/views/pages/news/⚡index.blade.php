@@ -20,9 +20,24 @@ new #[Title('Sri Lanka News')] #[Layout('layouts.public')] class extends Compone
     public ?string $lang = null;
 
     /**
+     * The active source filter, bound to the ?source= URL query param.
+     * Null means "all sources".
+     */
+    #[Url(as: 'source', keep: true)]
+    public ?string $source = null;
+
+    /**
      * Reset pagination when the language filter changes.
      */
     public function updatedLang(): void
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Reset pagination when the source filter changes.
+     */
+    public function updatedSource(): void
     {
         $this->resetPage();
     }
@@ -44,10 +59,14 @@ new #[Title('Sri Lanka News')] #[Layout('layouts.public')] class extends Compone
     {
         $articles = $articleRepository->getPaginatedByLanguage(
             $this->resolvedLanguage(),
-            perPage: 15
+            perPage: 15,
+            sourceSlug: $this->source,
         );
 
-        return $this->view(['articles' => $articles]);
+        return $this->view([
+            'articles' => $articles,
+            'sources' => $articleRepository->getSourcesWithArticles(),
+        ]);
     }
 };
 ?>
@@ -95,6 +114,40 @@ new #[Title('Sri Lanka News')] #[Layout('layouts.public')] class extends Compone
             </a>
         @endforeach
     </div>
+
+    {{-- Source chips --}}
+    @if ($sources->isNotEmpty())
+        <div class="flex gap-2 mb-6 flex-wrap" role="tablist" aria-label="Filter by source">
+            <a
+                href="{{ route('news.index', ['lang' => $lang]) }}"
+                wire:navigate
+                role="tab"
+                aria-selected="{{ $source === null ? 'true' : 'false' }}"
+                @class([
+                    'px-4 py-1.5 rounded-full text-sm font-medium transition',
+                    'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' => $source === null,
+                    'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700' => $source !== null,
+                ])
+            >
+                All sources
+            </a>
+            @foreach ($sources as $item)
+                <a
+                    href="{{ route('news.index', ['lang' => $lang, 'source' => $item->slug]) }}"
+                    wire:navigate
+                    role="tab"
+                    aria-selected="{{ $source === $item->slug ? 'true' : 'false' }}"
+                    @class([
+                        'px-4 py-1.5 rounded-full text-sm font-medium transition',
+                        'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900' => $source === $item->slug,
+                        'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700' => $source !== $item->slug,
+                    ])
+                >
+                    {{ $item->name }}
+                </a>
+            @endforeach
+        </div>
+    @endif
 
     {{-- Article list --}}
     @if ($articles->isEmpty())

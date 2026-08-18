@@ -7,6 +7,7 @@ use App\Enums\Language;
 use App\Models\Article;
 use App\Models\NewsSource;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * Contract for all article data access operations.
@@ -52,12 +53,20 @@ interface ArticleRepositoryInterface
     public function markAiStatus(Article $article, AiStatus $status): void;
 
     /**
-     * Return a paginated list of articles, optionally filtered by language.
-     * Ordered by published_at descending.
+     * Return a paginated list of articles, optionally filtered by language
+     * and/or source slug. Ordered by published_at descending.
      *
      * @return LengthAwarePaginator<int, Article>
      */
-    public function getPaginatedByLanguage(?Language $language, int $perPage = 15): LengthAwarePaginator;
+    public function getPaginatedByLanguage(?Language $language, int $perPage = 15, ?string $sourceSlug = null): LengthAwarePaginator;
+
+    /**
+     * Return all news sources that currently have at least one article,
+     * ordered by name.
+     *
+     * @return Collection<int, NewsSource>
+     */
+    public function getSourcesWithArticles(): Collection;
 
     /**
      * Find a single article by its primary key.

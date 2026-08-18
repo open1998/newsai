@@ -180,6 +180,68 @@ test('news feed hides AI status badge when article is AI processed', function ()
         ->assertDontSee('Skipped');
 });
 
+// ── Source filter ─────────────────────────────────────────────────────────────
+
+test('setting source filters to articles from that source only', function () {
+    $sourceA = NewsSource::factory()->create(['slug' => 'source-a']);
+    $sourceB = NewsSource::factory()->create(['slug' => 'source-b']);
+
+    Article::factory()->count(3)->create(['news_source_id' => $sourceA->id]);
+    Article::factory()->count(2)->create(['news_source_id' => $sourceB->id]);
+
+    Livewire::test('pages::news.index')
+        ->set('source', 'source-a')
+        ->assertViewHas('articles', function ($paginator) {
+            return $paginator->total() === 3;
+        });
+});
+
+test('setting an unknown source slug returns an empty feed', function () {
+    Article::factory()->count(2)->create();
+
+    Livewire::test('pages::news.index')
+        ->set('source', 'does-not-exist')
+        ->assertViewHas('articles', function ($paginator) {
+            return $paginator->total() === 0;
+        });
+});
+
+test('changing source resets pagination to page 1', function () {
+    $sourceA = NewsSource::factory()->create(['slug' => 'source-a']);
+
+    Article::factory()->count(20)->create(['news_source_id' => $sourceA->id]);
+
+    $component = Livewire::test('pages::news.index')
+        ->set('source', 'source-a')
+        ->call('nextPage');
+
+    $component->set('source', null);
+
+    expect($component->get('page') ?? 1)->toBe(1);
+});
+
+test('source chips list only sources that have articles', function () {
+    $withArticles = NewsSource::factory()->create(['name' => 'With Articles Source']);
+    NewsSource::factory()->create(['name' => 'Without Articles Source']);
+
+    Article::factory()->create(['news_source_id' => $withArticles->id]);
+
+    $this->get(route('news.index'))
+        ->assertOk()
+        ->assertSee('With Articles Source')
+        ->assertDontSee('Without Articles Source');
+});
+
+test('source chip links preserve the active language filter', function () {
+    $source = NewsSource::factory()->create(['slug' => 'source-a']);
+
+    Article::factory()->create(['news_source_id' => $source->id]);
+
+    Livewire::test('pages::news.index')
+        ->set('lang', 'en')
+        ->assertSee(route('news.index', ['lang' => 'en', 'source' => 'source-a']));
+});
+
 // ── Pagination ────────────────────────────────────────────────────────────────
 
 test('news feed paginates at 15 articles per page', function () {

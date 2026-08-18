@@ -175,6 +175,73 @@ test('getPaginatedByLanguage orders by published_at descending', function () {
         ->and($results[1]->id)->toBe($older->id);
 });
 
+// ── getPaginatedByLanguage: source filter ────────────────────────────────────
+
+test('getPaginatedByLanguage filters by source slug', function () {
+    $sourceA = NewsSource::factory()->create(['slug' => 'source-a']);
+    $sourceB = NewsSource::factory()->create(['slug' => 'source-b']);
+
+    Article::factory()->count(3)->create(['news_source_id' => $sourceA->id]);
+    Article::factory()->count(2)->create(['news_source_id' => $sourceB->id]);
+
+    $repo = app(ArticleRepositoryInterface::class);
+
+    expect($repo->getPaginatedByLanguage(null, 15, 'source-a')->total())->toBe(3);
+});
+
+test('getPaginatedByLanguage combines language and source filters', function () {
+    $sourceA = NewsSource::factory()->create(['slug' => 'source-a']);
+    $sourceB = NewsSource::factory()->create(['slug' => 'source-b']);
+
+    Article::factory()->english()->count(3)->create(['news_source_id' => $sourceA->id]);
+    Article::factory()->tamil()->count(2)->create(['news_source_id' => $sourceA->id]);
+    Article::factory()->english()->count(2)->create(['news_source_id' => $sourceB->id]);
+
+    $repo = app(ArticleRepositoryInterface::class);
+
+    expect($repo->getPaginatedByLanguage(Language::En, 15, 'source-a')->total())->toBe(3);
+});
+
+test('getPaginatedByLanguage returns all articles when source slug is null', function () {
+    $sourceA = NewsSource::factory()->create(['slug' => 'source-a']);
+    $sourceB = NewsSource::factory()->create(['slug' => 'source-b']);
+
+    Article::factory()->count(2)->create(['news_source_id' => $sourceA->id]);
+    Article::factory()->count(2)->create(['news_source_id' => $sourceB->id]);
+
+    $repo = app(ArticleRepositoryInterface::class);
+
+    expect($repo->getPaginatedByLanguage(null, 15, null)->total())->toBe(4);
+});
+
+// ── getSourcesWithArticles ───────────────────────────────────────────────────
+
+test('getSourcesWithArticles returns only sources that have articles', function () {
+    $withArticles = NewsSource::factory()->create(['name' => 'With Articles']);
+    $withoutArticles = NewsSource::factory()->create(['name' => 'Without Articles']);
+
+    Article::factory()->create(['news_source_id' => $withArticles->id]);
+
+    $repo = app(ArticleRepositoryInterface::class);
+
+    $names = $repo->getSourcesWithArticles()->pluck('name')->all();
+
+    expect($names)->toContain('With Articles')
+        ->and($names)->not->toContain('Without Articles');
+});
+
+test('getSourcesWithArticles orders sources by name', function () {
+    $zeta = NewsSource::factory()->create(['name' => 'Zeta News']);
+    $alpha = NewsSource::factory()->create(['name' => 'Alpha News']);
+
+    Article::factory()->create(['news_source_id' => $zeta->id]);
+    Article::factory()->create(['news_source_id' => $alpha->id]);
+
+    $repo = app(ArticleRepositoryInterface::class);
+
+    expect($repo->getSourcesWithArticles()->pluck('name')->all())->toBe(['Alpha News', 'Zeta News']);
+});
+
 // ── findById ─────────────────────────────────────────────────────────────────
 
 test('findById returns article by id', function () {

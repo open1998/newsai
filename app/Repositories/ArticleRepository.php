@@ -9,6 +9,7 @@ use App\Enums\ScrapeStatus;
 use App\Models\Article;
 use App\Models\NewsSource;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Collection;
 
 class ArticleRepository implements ArticleRepositoryInterface
 {
@@ -88,16 +89,32 @@ class ArticleRepository implements ArticleRepositoryInterface
     }
 
     /**
-     * Return a paginated, language-filtered list of articles ordered by published_at.
+     * Return a paginated list of articles, optionally filtered by language
+     * and/or source slug. Ordered by published_at descending.
      *
      * @return LengthAwarePaginator<int, Article>
      */
-    public function getPaginatedByLanguage(?Language $language, int $perPage = 15): LengthAwarePaginator
+    public function getPaginatedByLanguage(?Language $language, int $perPage = 15, ?string $sourceSlug = null): LengthAwarePaginator
     {
         return Article::with('newsSource')
             ->when($language !== null, fn ($q) => $q->forLanguage($language))
+            ->when($sourceSlug !== null, fn ($q) => $q->whereHas('newsSource', fn ($q) => $q->where('slug', $sourceSlug)))
             ->orderByDesc('published_at')
             ->paginate($perPage);
+    }
+
+    /**
+     * Return all news sources that currently have at least one article,
+     * ordered by name.
+     *
+     * @return Collection<int, NewsSource>
+     */
+    public function getSourcesWithArticles(): Collection
+    {
+        return NewsSource::query()
+            ->whereHas('articles')
+            ->orderBy('name')
+            ->get();
     }
 
     /**
