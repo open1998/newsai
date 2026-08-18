@@ -55,7 +55,7 @@ interface ArticleRepositoryInterface
      * Return a paginated list of articles, optionally filtered by language.
      * Ordered by published_at descending.
      *
-     * @return LengthAwarePaginator<Article>
+     * @return LengthAwarePaginator<int, Article>
      */
     public function getPaginatedByLanguage(?Language $language, int $perPage = 15): LengthAwarePaginator;
 

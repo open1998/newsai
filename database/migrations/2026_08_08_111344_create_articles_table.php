@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('news_source_id')->constrained()->cascadeOnDelete()->index();
+            $table->foreignId('news_source_id')->constrained()->cascadeOnDelete();
+            $table->index('news_source_id');
             $table->string('source_url');
             $table->string('language')->index(); // Language enum value
             $table->string('content_hash', 64)->nullable()->index();

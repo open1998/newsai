@@ -87,6 +87,9 @@ class Article extends Model
 
     /**
      * Scope to articles that have been successfully AI processed.
+     *
+     * @param  Builder<Article>  $query
+     * @return Builder<Article>
      */
     public function scopeAiProcessed(Builder $query): Builder
     {
@@ -95,6 +98,9 @@ class Article extends Model
 
     /**
      * Scope to articles by language.
+     *
+     * @param  Builder<Article>  $query
+     * @return Builder<Article>
      */
     public function scopeForLanguage(Builder $query, Language $language): Builder
     {

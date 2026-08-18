@@ -22,7 +22,7 @@ class ArticleFactory extends Factory
     public function definition(): array
     {
         $originalTitle = fake()->sentence();
-        $originalBody = implode("\n\n", fake()->paragraphs(4));
+        $originalBody = implode("\n\n", (array) fake()->paragraphs(4));
 
         return [
             'news_source_id' => NewsSource::factory(),
@@ -53,7 +53,7 @@ class ArticleFactory extends Factory
             return [
                 'ai_status' => AiStatus::Succeeded,
                 'ai_title' => 'AI: '.fake()->sentence(),
-                'ai_body' => implode("\n\n", fake()->paragraphs(4)),
+                'ai_body' => implode("\n\n", (array) fake()->paragraphs(4)),
                 'ai_summary' => fake()->paragraph(),
                 'ai_processed_at' => now(),
             ];

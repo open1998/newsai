@@ -90,7 +90,7 @@ class ArticleRepository implements ArticleRepositoryInterface
     /**
      * Return a paginated, language-filtered list of articles ordered by published_at.
      *
-     * @return LengthAwarePaginator<Article>
+     * @return LengthAwarePaginator<int, Article>
      */
     public function getPaginatedByLanguage(?Language $language, int $perPage = 15): LengthAwarePaginator
     {
