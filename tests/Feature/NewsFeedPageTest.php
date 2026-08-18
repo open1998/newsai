@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\AiStatus;
 use App\Enums\Language;
 use App\Models\Article;
 use App\Models\NewsSource;
@@ -32,8 +33,8 @@ test('news feed displays article titles', function () {
     $source = NewsSource::factory()->create();
     Article::factory()->aiProcessed()->create([
         'news_source_id' => $source->id,
-        'language'       => Language::En,
-        'published_at'   => now()->subHour(),
+        'language' => Language::En,
+        'published_at' => now()->subHour(),
     ]);
 
     $this->get(route('news.index'))
@@ -42,10 +43,10 @@ test('news feed displays article titles', function () {
 });
 
 test('news feed shows AI title when article is AI processed', function () {
-    $source  = NewsSource::factory()->create();
+    $source = NewsSource::factory()->create();
     $article = Article::factory()->aiProcessed()->create([
         'news_source_id' => $source->id,
-        'language'       => Language::En,
+        'language' => Language::En,
     ]);
 
     $this->get(route('news.index'))
@@ -53,11 +54,11 @@ test('news feed shows AI title when article is AI processed', function () {
 });
 
 test('news feed falls back to original title when AI not processed', function () {
-    $source  = NewsSource::factory()->create();
+    $source = NewsSource::factory()->create();
     $article = Article::factory()->create([
         'news_source_id' => $source->id,
-        'language'       => Language::En,
-        'ai_title'       => null,
+        'language' => Language::En,
+        'ai_title' => null,
     ]);
 
     $this->get(route('news.index'))
@@ -133,6 +134,50 @@ test('changing lang resets pagination to page 1', function () {
     $component->set('lang', 'ta');
 
     expect($component->get('page') ?? 1)->toBe(1);
+});
+
+// ── AI status badges ──────────────────────────────────────────────────────────
+
+test('news feed shows queued badge for pending articles', function () {
+    Article::factory()->create(['ai_status' => AiStatus::Pending]);
+
+    $this->get(route('news.index'))
+        ->assertOk()
+        ->assertSee('Queued');
+});
+
+test('news feed shows AI rewriting badge for processing articles', function () {
+    Article::factory()->create(['ai_status' => AiStatus::Processing]);
+
+    $this->get(route('news.index'))
+        ->assertOk()
+        ->assertSee('AI rewriting');
+});
+
+test('news feed shows AI failed badge for failed articles', function () {
+    Article::factory()->aiFailed()->create();
+
+    $this->get(route('news.index'))
+        ->assertOk()
+        ->assertSee('AI failed');
+});
+
+test('news feed shows skipped badge for skipped articles', function () {
+    Article::factory()->create(['ai_status' => AiStatus::Skipped]);
+
+    $this->get(route('news.index'))
+        ->assertOk()
+        ->assertSee('Skipped');
+});
+
+test('news feed hides AI status badge when article is AI processed', function () {
+    Article::factory()->aiProcessed()->create();
+
+    $this->get(route('news.index'))
+        ->assertOk()
+        ->assertDontSee('Queued')
+        ->assertDontSee('AI failed')
+        ->assertDontSee('Skipped');
 });
 
 // ── Pagination ────────────────────────────────────────────────────────────────

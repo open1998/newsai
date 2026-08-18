@@ -32,6 +32,22 @@
             <flux:badge size="sm" color="{{ match($article->language->value) { 'en' => 'blue', 'ta' => 'green', 'si' => 'yellow', default => 'zinc' } }}">
                 {{ $article->language->label() }}
             </flux:badge>
+
+            @if ($article->ai_status !== \App\Enums\AiStatus::Succeeded)
+                <flux:badge size="sm" color="{{ match ($article->ai_status) {
+                    \App\Enums\AiStatus::Processing => 'amber',
+                    \App\Enums\AiStatus::Failed => 'red',
+                    default => 'zinc',
+                } }}">
+                    {{ match ($article->ai_status) {
+                        \App\Enums\AiStatus::Pending => 'Queued',
+                        \App\Enums\AiStatus::Processing => 'AI rewriting…',
+                        \App\Enums\AiStatus::Failed => 'AI failed',
+                        \App\Enums\AiStatus::Skipped => 'Skipped',
+                        default => 'Queued',
+                    } }}
+                </flux:badge>
+            @endif
         </div>
 
         <h3 class="text-sm font-semibold text-zinc-900 dark:text-zinc-100 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 leading-snug">
