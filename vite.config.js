@@ -18,6 +18,12 @@ export default defineConfig({
                 bunny('Instrument Sans', {
                     weights: [400, 500, 600],
                 }),
+                bunny('Noto Sans Tamil', {
+                    weights: [400, 500, 600, 700],
+                }),
+                bunny('Noto Sans Sinhala', {
+                    weights: [400, 500, 600, 700],
+                }),
             ],
         }),
         tailwindcss(),
